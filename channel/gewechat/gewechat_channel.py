@@ -3,6 +3,12 @@
 """
 gewechat channel
 """
+import io
+import json
+import os
+import threading
+import time
+import requests
 
 from bridge.context import *
 from bridge.reply import *
@@ -15,6 +21,22 @@ from common.singleton import singleton
 from config import conf, get_appdata_dir
 from lib import gewechat
 
+def _check(func):
+    def wrapper(self, cmsg: ChatMessage):
+        msgId = cmsg.msg_id
+        if msgId in self.receivedMsgs:
+            logger.info("GeWeChat message {} already received, ignore".format(msgId))
+            return
+        self.receivedMsgs[msgId] = True
+        create_time = cmsg.create_time
+        if conf().get("hot_reload") == True and int(create_time) < int(time.time()) - 60:
+            logger.debug("[GEWX]history message {} skipped".format(msgId))
+            return
+        if cmsg.my_msg and not cmsg.is_group:
+            logger.debug("[GEWX]my message {} skipped".format(msgId))
+            return
+        return func(self, cmsg)
+    return wrapper
 
 @singleton
 class GeWeChatChannel(ChatChannel):
@@ -98,23 +120,6 @@ class GeWeChatChannel(ChatChannel):
 def qrCallback(uuid, status, qrcode):
     # Implement qrCallback function
     pass
-
-def _check(func):
-    def wrapper(self, cmsg: ChatMessage):
-        msgId = cmsg.msg_id
-        if msgId in self.receivedMsgs:
-            logger.info("GeWeChat message {} already received, ignore".format(msgId))
-            return
-        self.receivedMsgs[msgId] = True
-        create_time = cmsg.create_time
-        if conf().get("hot_reload") == True and int(create_time) < int(time.time()) - 60:
-            logger.debug("[GEWX]history message {} skipped".format(msgId))
-            return
-        if cmsg.my_msg and not cmsg.is_group:
-            logger.debug("[GEWX]my message {} skipped".format(msgId))
-            return
-        return func(self, cmsg)
-    return wrapper
 
 def _send_login_success():
     pass

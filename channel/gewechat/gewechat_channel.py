@@ -46,11 +46,15 @@ class GeWeChatChannel(ChatChannel):
         receiver = context["receiver"]
         if reply.type in [ReplyType.TEXT, ReplyType.ERROR, ReplyType.INFO]:
             reply_text = reply.content
+            gewechat_message = context.get("msg")
+            ats = ""
+            if gewechat_message:
+                ats = gewechat_message.actual_user_id
             texts = split_string_by_utf8_length(reply_text, MAX_UTF8_LEN)
             if len(texts) > 1:
                 logger.info("[gewechat] text too long, split into {} parts".format(len(texts)))
             for i, text in enumerate(texts):
-                self.client.post_text(self.app_id, receiver, text)
+                self.client.post_text(self.app_id, receiver, text, ats)
                 if i != len(texts) - 1:
                     time.sleep(0.5)
             logger.info("[gewechat] Do send text to {}: {}".format(receiver, reply_text))

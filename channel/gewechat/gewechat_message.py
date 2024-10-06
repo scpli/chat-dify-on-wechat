@@ -33,17 +33,14 @@ class GeWeChatMessage(ChatMessage):
 
         # 补充群聊信息
         if self.is_group:
+            # TODO: 获取群聊信息与实际发送人信息
             self.other_user_id = self.from_user_id  # 群ID
-            self.other_user_nickname = self.msg.get('Data', {}).get('PushContent', '').split(':')[0].strip()  # 群名称
+            self.other_user_nickname = ''  # 群名称
             self.actual_user_id = self.msg.get('Data', {}).get('Content', {}).get('string', '').split(':', 1)[0]  # 实际发送者ID
-            self.actual_user_nickname = self.msg.get('Data', {}).get('PushContent', '').split(':', 1)[0].strip()  # 实际发送者昵称
+            self.actual_user_nickname = ''  # 实际发送者昵称
             
             # 检查是否被@
-            self.is_at = '@' in self.msg.get('Data', {}).get('MsgSource', '')
-            if self.is_at:
-                self.at_list = [user.strip() for user in self.msg.get('Data', {}).get('MsgSource', '').split('<atuserlist><![CDATA[')[1].split(']]>')[0].split(',') if user.strip()]
-            else:
-                self.at_list = []
+            self.is_at = '在群聊中@了你' in self.msg.get('Data', {}).get('PushContent', '')
 
             # 如果是群消息，更新content为实际内容（去掉发送者ID）
             if ':' in self.content:

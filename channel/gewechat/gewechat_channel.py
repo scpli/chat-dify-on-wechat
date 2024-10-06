@@ -60,26 +60,24 @@ class GeWeChatChannel(ChatChannel):
             logger.info("[gewechat] Do send text to {}: {}".format(receiver, reply_text))
         elif reply.type == ReplyType.VOICE:
             try:
-                file_path = reply.content
-                amr_file = os.path.splitext(file_path)[0] + ".amr"
-                any_to_amr(file_path, amr_file)
-                duration, files = split_audio(amr_file, 60 * 1000)
-                if len(files) > 1:
-                    logger.info("[gewechat] voice too long {}s > 60s , split into {} parts".format(duration / 1000.0, len(files)))
-                for path in files:
-                    with open(path, "rb") as f:
-                        self.client.post_voice(self.app_id, receiver, f.read(), int(duration))
-                    time.sleep(1)
+                gewechat_message = context.get("msg")
+                if gewechat_message and gewechat_message.content:
+                    voice_content = json.loads(gewechat_message.content)
+                    if 'ImgBuf' in voice_content and 'buffer' in voice_content['ImgBuf']:
+                        silk_data = base64.b64decode(voice_content['ImgBuf']['buffer'])
+                        silk_file = os.path.join(conf().get("tmp_path", "./tmp"), f"voice_{int(time.time())}.silk")
+                        with open(silk_file, "wb") as f:
+                            f.write(silk_data)
+                        duration = voice_content['ImgBuf']['iLen']  # 假设duration存储在iLen中
+                        voice_url = f"/download?file={os.path.basename(silk_file)}"
+                        self.client.post_voice(self.app_id, receiver, voice_url, int(duration))
+                        logger.info(f"[gewechat] sendVoice={voice_url}, receiver={receiver}")
+                    else:
+                        logger.error("[gewechat] Invalid voice message format")
+                else:
+                    logger.error("[gewechat] No voice content found in message")
             except Exception as e:
-                logger.error("[gewechat] send voice failed: {}".format(e))
-            finally:
-                try:
-                    os.remove(file_path)
-                    if amr_file != file_path:
-                        os.remove(amr_file)
-                except:
-                    pass
-            logger.info("[gewechat] sendVoice={}, receiver={}".format(reply.content, receiver))
+                logger.error(f"[gewechat] send voice failed: {e}")
         elif reply.type == ReplyType.IMAGE_URL:
             img_url = reply.content
             pic_res = requests.get(img_url, stream=True)
@@ -113,6 +111,14 @@ class GeWeChatChannel(ChatChannel):
 
 class Query:
     def GET(self):
+        params = web.input(file="")
+        if params.file:
+            file_path = os.path.join(conf().get("tmp_path", "./tmp"), params.file)
+            if os.path.exists(file_path):
+                with open(file_path, 'rb') as f:
+                    return f.read()
+            else:
+                raise web.notfound()
         return "gewechat callback server running"
 
     def POST(self):

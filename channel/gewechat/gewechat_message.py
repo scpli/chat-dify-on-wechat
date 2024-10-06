@@ -17,6 +17,7 @@ class GeWeChatMessage(ChatMessage):
         self.client = client
 
         msg_type = msg['Data']['MsgType']
+        self.app_id = msg['Wxid']  # 假设 'Wxid' 字段包含 app_id
         if msg_type == 1:  # Text message
             self.ctype = ContextType.TEXT
             self.content = msg['Data']['Content']['string']
@@ -41,14 +42,24 @@ class GeWeChatMessage(ChatMessage):
         self.to_user_id = msg['Data']['ToUserName']['string']
         self.other_user_id = self.from_user_id
 
+        # 获取群聊或好友信息
+        brief_info = self.client.get_brief_info(self.app_id, [self.other_user_id])
+        if brief_info['ret'] == 200 and brief_info['data']:
+            info = brief_info['data'][0]
+            self.other_user_nickname = info.get('nickName', '')
+
         # 补充群聊信息
         if self.is_group:
-            # TODO: 获取群聊信息与实际发送人信息
             self.other_user_id = self.from_user_id  # 群ID
-            self.other_user_nickname = ''  # 群名称
             self.actual_user_id = self.msg.get('Data', {}).get('Content', {}).get('string', '').split(':', 1)[0]  # 实际发送者ID
-            self.actual_user_nickname = ''  # 实际发送者昵称
             
+            # 获取实际发送者信息
+            actual_user_info = self.client.get_brief_info(self.app_id, [self.actual_user_id])
+            if actual_user_info['ret'] == 200 and actual_user_info['data']:
+                self.actual_user_nickname = actual_user_info['data'][0].get('nickName', '')
+            else:
+                self.actual_user_nickname = ''
+
             # 检查是否被@
             self.is_at = '在群聊中@了你' in self.msg.get('Data', {}).get('PushContent', '')
 
@@ -56,7 +67,8 @@ class GeWeChatMessage(ChatMessage):
             if ':' in self.content:
                 self.content = self.content.split(':', 1)[1].strip()
         else:
-            self.other_user_nickname = ''  # 单聊时可能需要额外获取昵称
+            self.actual_user_id = self.other_user_id
+            self.actual_user_nickname = self.other_user_nickname
 
         self.my_msg = self.msg['Wxid'] == self.from_user_id
         self.self_display_name = ''  # 可能需要额外获取自身在群中的展示名称

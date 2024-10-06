@@ -2,33 +2,52 @@ from bridge.context import ContextType
 from channel.chat_message import ChatMessage
 from common.log import logger
 from common.tmp_dir import TmpDir
+from reference_context.gewechat import GewechatClient
 
 class GeWeChatMessage(ChatMessage):
-    def __init__(self, msg, is_group=False):
+    def __init__(self, msg, client: GewechatClient):
         super().__init__(msg)
-        self.msg_id = msg.get('MsgId')
-        self.create_time = msg.get('CreateTime')
-        self.is_group = is_group
+        self.msg = msg
+        self.client = client
+        self.msg_id = msg['Data']['NewMsgId']
+        self.create_time = msg['Data']['CreateTime']
+        self.is_group = msg['Data']['FromUserName']['string'] != msg['Wxid']
 
-        msg_type = msg.get('MsgType')
-        if msg_type == 'text':
+        msg_type = msg['Data']['MsgType']
+        if msg_type == 1:  # Text message
             self.ctype = ContextType.TEXT
-            self.content = msg.get('Content')
-        elif msg_type == 'voice':
+            self.content = msg['Data']['Content']['string']
+        elif msg_type == 34:  # Voice message
             self.ctype = ContextType.VOICE
-            self.content = TmpDir().path() + msg.get('MediaId') + ".amr"  # content直接存临时目录路径
-            # TODO: Implement voice file downloading for Gewechat
-        elif msg_type == 'image':
+            self.content = TmpDir().path() + str(self.msg_id) + ".amr"
+            self._prepare_fn = self.download_voice
+        elif msg_type == 3:  # Image message
             self.ctype = ContextType.IMAGE
-            self.content = TmpDir().path() + msg.get('MediaId') + ".png"  # content直接存临时目录路径
-            # TODO: Implement image file downloading for Gewechat
+            self.content = TmpDir().path() + str(self.msg_id) + ".png"
+            self._prepare_fn = self.download_image
         else:
-            raise NotImplementedError("Unsupported message type: Type:{} ".format(msg_type))
+            raise NotImplementedError("Unsupported message type: Type:{}".format(msg_type))
 
-        self.from_user_id = msg.get('FromUserName')
-        self.to_user_id = msg.get('ToUserName')
+        self.from_user_id = msg['Data']['FromUserName']['string']
+        self.to_user_id = msg['Data']['ToUserName']['string']
         self.other_user_id = self.from_user_id
 
+    def download_voice(self):
+        try:
+            voice_data = self.client.download_file(self.msg['Wxid'], self.msg_id)
+            with open(self.content, "wb") as f:
+                f.write(voice_data)
+        except Exception as e:
+            logger.error(f"[gewechat] Failed to download voice file: {e}")
+
+    def download_image(self):
+        try:
+            image_data = self.client.download_file(self.msg['Wxid'], self.msg_id)
+            with open(self.content, "wb") as f:
+                f.write(image_data)
+        except Exception as e:
+            logger.error(f"[gewechat] Failed to download image file: {e}")
+
     def prepare(self):
-        # This method can be used to perform any necessary preparations before processing the message
-        pass
+        if self._prepare_fn:
+            self._prepare_fn()

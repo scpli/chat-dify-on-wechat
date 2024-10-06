@@ -2,16 +2,15 @@ from bridge.context import ContextType
 from channel.chat_message import ChatMessage
 from common.log import logger
 from common.tmp_dir import TmpDir
-from reference_context.gewechat import GewechatClient
+from lib.gewechat import GewechatClient
 
 class GeWeChatMessage(ChatMessage):
     def __init__(self, msg, client: GewechatClient):
         super().__init__(msg)
         self.msg = msg
-        self.client = client
         self.msg_id = msg['Data']['NewMsgId']
         self.create_time = msg['Data']['CreateTime']
-        self.is_group = msg['Data']['FromUserName']['string'] != msg['Wxid']
+        self.is_group = True if "@chatroom" in msg['Data']['FromUserName']['string'] else False
 
         msg_type = msg['Data']['MsgType']
         if msg_type == 1:  # Text message

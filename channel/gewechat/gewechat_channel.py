@@ -13,9 +13,9 @@ from channel.gewechat.gewechat_message import GeWeChatMessage
 from common.log import logger
 from common.singleton import singleton
 from common.utils import compress_imgfile, fsize, split_string_by_utf8_length, convert_webp_to_png
-from config import conf, subscribe_msg
+from config import conf
 from voice.audio_convert import any_to_amr, split_audio
-from reference_context.gewechat import GewechatClient
+from lib.gewechat import GewechatClient
 
 MAX_UTF8_LEN = 2048
 
@@ -37,9 +37,9 @@ class GeWeChatChannel(ChatChannel):
         self.client = GewechatClient(self.base_url, self.download_url, self.token)
 
     def startup(self):
-        urls = ("/gewechat/?", "channel.gewechat.gewechat_channel.Query")
+        urls = ("/v2/api/callback/collect", "channel.gewechat.gewechat_channel.Query")
         app = web.application(urls, globals(), autoreload=False)
-        port = conf().get("gewechat_port", 9919)
+        port = conf().get("gewechat_callback_server_port", 9919)
         web.httpserver.runsimple(app.wsgifunc(), ("0.0.0.0", port))
 
     def send(self, reply: Reply, context: Context):
@@ -109,7 +109,7 @@ class GeWeChatChannel(ChatChannel):
 
 class Query:
     def GET(self):
-        return "success"
+        return "gewechat callback server running"
 
     def POST(self):
         channel = GeWeChatChannel()

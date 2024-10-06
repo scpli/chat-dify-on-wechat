@@ -4,6 +4,7 @@ from bridge.context import ContextType
 from channel.chat_message import ChatMessage
 from common.log import logger
 from common.tmp_dir import TmpDir
+from config import conf
 from lib.gewechat import GewechatClient
 
 class GeWeChatMessage(ChatMessage):
@@ -17,7 +18,7 @@ class GeWeChatMessage(ChatMessage):
         self.client = client
 
         msg_type = msg['Data']['MsgType']
-        self.app_id = msg['Wxid']  # 假设 'Wxid' 字段包含 app_id
+        self.app_id = conf().get("gewechat_app_id")
         if msg_type == 1:  # Text message
             self.ctype = ContextType.TEXT
             self.content = msg['Data']['Content']['string']
@@ -50,7 +51,6 @@ class GeWeChatMessage(ChatMessage):
 
         # 补充群聊信息
         if self.is_group:
-            self.other_user_id = self.from_user_id  # 群ID
             self.actual_user_id = self.msg.get('Data', {}).get('Content', {}).get('string', '').split(':', 1)[0]  # 实际发送者ID
             
             # 获取实际发送者信息

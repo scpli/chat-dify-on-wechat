@@ -12,6 +12,8 @@ class GeWeChatMessage(ChatMessage):
         self.create_time = msg['Data']['CreateTime']
         self.is_group = True if "@chatroom" in msg['Data']['FromUserName']['string'] else False
 
+        self.client = client
+
         msg_type = msg['Data']['MsgType']
         if msg_type == 1:  # Text message
             self.ctype = ContextType.TEXT

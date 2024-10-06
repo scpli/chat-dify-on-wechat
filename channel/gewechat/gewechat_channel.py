@@ -1,7 +1,9 @@
+import base64
 import io
 import os
 import time
 import json
+import uuid
 
 import requests
 import web
@@ -12,9 +14,10 @@ from channel.chat_channel import ChatChannel
 from channel.gewechat.gewechat_message import GeWeChatMessage
 from common.log import logger
 from common.singleton import singleton
+from common.tmp_dir import TmpDir
 from common.utils import compress_imgfile, fsize, split_string_by_utf8_length, convert_webp_to_png
 from config import conf
-from voice.audio_convert import any_to_amr, split_audio
+from voice.audio_convert import any_to_amr, any_to_mp3, split_audio
 from lib.gewechat import GewechatClient
 
 MAX_UTF8_LEN = 2048
@@ -44,38 +47,18 @@ class GeWeChatChannel(ChatChannel):
 
     def send(self, reply: Reply, context: Context):
         receiver = context["receiver"]
+        gewechat_message = context.get("msg")
         if reply.type in [ReplyType.TEXT, ReplyType.ERROR, ReplyType.INFO]:
             reply_text = reply.content
-            gewechat_message = context.get("msg")
             ats = ""
-            if gewechat_message:
-                ats = gewechat_message.actual_user_id
-            texts = split_string_by_utf8_length(reply_text, MAX_UTF8_LEN)
-            if len(texts) > 1:
-                logger.info("[gewechat] text too long, split into {} parts".format(len(texts)))
-            for i, text in enumerate(texts):
-                self.client.post_text(self.app_id, receiver, text, ats)
-                if i != len(texts) - 1:
-                    time.sleep(0.5)
+            # if gewechat_message:
+            #     ats = gewechat_message.actual_user_id
+            self.client.post_text(self.app_id, receiver, reply_text, ats)
             logger.info("[gewechat] Do send text to {}: {}".format(receiver, reply_text))
         elif reply.type == ReplyType.VOICE:
             try:
-                gewechat_message = context.get("msg")
-                if gewechat_message and gewechat_message.content:
-                    voice_content = json.loads(gewechat_message.content)
-                    if 'ImgBuf' in voice_content and 'buffer' in voice_content['ImgBuf']:
-                        silk_data = base64.b64decode(voice_content['ImgBuf']['buffer'])
-                        silk_file = os.path.join(conf().get("tmp_path", "./tmp"), f"voice_{int(time.time())}.silk")
-                        with open(silk_file, "wb") as f:
-                            f.write(silk_data)
-                        duration = voice_content['ImgBuf']['iLen']  # 假设duration存储在iLen中
-                        voice_url = f"/download?file={os.path.basename(silk_file)}"
-                        self.client.post_voice(self.app_id, receiver, voice_url, int(duration))
-                        logger.info(f"[gewechat] sendVoice={voice_url}, receiver={receiver}")
-                    else:
-                        logger.error("[gewechat] Invalid voice message format")
-                else:
-                    logger.error("[gewechat] No voice content found in message")
+                # TODO: mp3 to silk
+                content = reply.content
             except Exception as e:
                 logger.error(f"[gewechat] send voice failed: {e}")
         elif reply.type == ReplyType.IMAGE_URL:
@@ -113,13 +96,13 @@ class Query:
     def GET(self):
         params = web.input(file="")
         if params.file:
-            file_path = os.path.join(conf().get("tmp_path", "./tmp"), params.file)
+            file_path = os.path.join("tmp", params.file)
             if os.path.exists(file_path):
                 with open(file_path, 'rb') as f:
                     return f.read()
             else:
                 raise web.notfound()
-        return "gewechat callback server running"
+        return "gewechat callback server is running"
 
     def POST(self):
         channel = GeWeChatChannel()

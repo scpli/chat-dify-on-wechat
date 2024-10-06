@@ -1,3 +1,5 @@
+import base64
+import uuid
 from bridge.context import ContextType
 from channel.chat_message import ChatMessage
 from common.log import logger
@@ -20,8 +22,14 @@ class GeWeChatMessage(ChatMessage):
             self.content = msg['Data']['Content']['string']
         elif msg_type == 34:  # Voice message
             self.ctype = ContextType.VOICE
-            self.content = TmpDir().path() + str(self.msg_id) + ".amr"
-            self._prepare_fn = self.download_voice
+            if 'ImgBuf' in msg['Data'] and 'buffer' in msg['Data']['ImgBuf'] and msg['Data']['ImgBuf']['buffer']:
+                silk_data = base64.b64decode(msg['Data']['ImgBuf']['buffer'])
+                silk_file_name = f"voice_{str(uuid.uuid4())}.silk"
+                silk_file_path = TmpDir().path() + silk_file_name
+                with open(silk_file_path, "wb") as f:
+                    f.write(silk_data)
+                #TODO: silk2mp3
+                self.content = silk_file_path
         elif msg_type == 3:  # Image message
             self.ctype = ContextType.IMAGE
             self.content = TmpDir().path() + str(self.msg_id) + ".png"

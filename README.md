@@ -92,8 +92,9 @@ python app.py
 新增用户信息对接dify的能力，会把用户id、用户名称、群聊id、群聊名称信息传递给dify，搭配 gewechat_channel 提供的wxid与chatroomid，
 可以在dify中识别出每个用户，实现个性化服务。详细教程请查看：[用户信息对接dify](./docs/user-info/README.md)
 
-<img width="600" style="display: block; margin: 0 auto;" src="./docs/user-info/user-info-room.jpg">
-
+<div align="center">
+<img width="600" src="./docs/user-info/user-info-room.jpg">
+</div>
 
 ## 2. 支持企业微信个人号（仅支持windows系统）
 ![wework](./docs/images/wework.jpg)

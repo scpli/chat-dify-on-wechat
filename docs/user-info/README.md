@@ -13,13 +13,17 @@
 
 下载提供的 [用户信息.yml](../../dsl/用户信息.yml) 文件，在Dify中通过导入DSL文件的方式创建应用，如下图所示:
 
-![import-user-info-dsl](./import-user-info-dsl.jpg)
+<div align="center">
+<img width="700" src="./import-user-info-dsl.jpg">
+</div>
 
 ### 2.2 添加用户信息变量
 
 如下图所示，在刚刚创建的应用中，已经预先创建了`user_id`、`user_name`、`room_id`、`room_name`变量，在工作流中可以使用这些变量来唯一标识用户或获取用户信息，从而实现对不同用户的个性化服务。
 
-![user-info-fields](./user-info-fields.jpg)
+<div align="center">
+<img width="700" src="./user-info-fields.jpg">
+</div>
 
 你可以在自己创建的工作流中添加上述4个变量，但是在配置变量时，需要注意:
 1. 保证变量名一致
@@ -52,6 +56,10 @@
 
 分别测试私聊和群聊，在下图中可以看到能够正常获取到用户信息并返回。
 
-![user-info-single](./user-info-single.jpg)
+<div align="center">
+<img width="700" src="./user-info-single.jpg">
+</div>
 
-![user-info-room](./user-info-room.jpg)
+<div align="center">
+<img width="700" src="./user-info-room.jpg">
+</div>

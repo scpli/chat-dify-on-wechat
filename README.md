@@ -40,6 +40,7 @@ Dify接入微信生态的**详细教程**请查看文章 [**手摸手教你把 D
 
 
 # 最新功能
+
 ## 1. 支持gewechat登录微信
 基于[Gewechat](https://github.com/Devo919/Gewechat)项目实现的微信个人号通道,使用ipad协议登录,相比itchat协议更稳定。
 
@@ -85,6 +86,13 @@ python app.py
 
 ![gewechat_login](./docs/gewechat/gewechat_login.jpg)
 
+
+## 2. 用户信息对接dify
+
+新增用户信息对接dify的能力，会把用户id、用户名称、群聊id、群聊名称信息传递给dify，搭配 gewechat_channel 提供的wxid与chatroomid，
+可以在dify中识别出每个用户，实现个性化服务。详细教程请查看：[用户信息对接dify](./docs/user-info/README.md)
+
+<img width="480" src="./docs/user-info/user-info-room.jpg">
 
 ## 2. 支持企业微信个人号（仅支持windows系统）
 ![wework](./docs/images/wework.jpg)

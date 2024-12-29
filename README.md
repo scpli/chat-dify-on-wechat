@@ -77,6 +77,12 @@ Dify接入微信生态的**详细教程**请查看文章 [**手摸手教你把 D
 > 1. gewechat要求必须搭建服务到**同省服务器**或者电脑里方可正常使用
 > 2. 此项目仅用于个人娱乐场景，请勿用于任何商业场景
 
+dify-on-wechat、dify、gewechat服务的调用关系
+
+<div align="center">
+<img width="700" src="./docs/gewechat/gewechat_service_design.png">
+</div>
+
 ### 快速启动gewechat机器人
 
 #### 部署gewechat服务
@@ -282,17 +288,13 @@ dify语音相关配置如下，另外需要在dify应用中开启语音转文字
 }
 ```
 
-搭配 gewechat_channel 可以实现发送语音条功能，gewechat服务只能获取到**20s**以内的语音，所以**你只能给bot发送20s以内的语音**，但**bot给你发送语音时无此限制**。
+搭配 gewechat_channel 可以实现发送语音条功能，gewechat服务只能获取到**20s**以内的语音，所以**你只能给bot发送20s以内的语音**，但**bot给你发送语音时无此限制**。[**请查看gewechat接入文档**](./docs/gewechat/README.md)
 <div align="center">
 <img width="700" src="./docs/gewechat/gewechat_voice.jpg">
 </div>
 
-🔊[点击收听语音消息](./docs/audios/gewechat_voice.mp3)
+[点击下载语音文件](./docs/audios/gewechat_voice.mp3)
 
-<audio controls>
-  <source src="./docs/audios/gewechat_voice.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
 
 ## 9. 支持dify图片识别
 

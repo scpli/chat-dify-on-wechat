@@ -118,12 +118,11 @@ class GeWeChatChannel(ChatChannel):
                 if content.endswith('.mp3'):
                     # 如果是mp3文件，转换为silk格式
                     silk_path = content + '.silk'
-                    silk_path = mp3_to_silk(content, silk_path)
+                    duration = mp3_to_silk(content, silk_path)
                     callback_url = conf().get("gewechat_callback_url")
                     silk_url = callback_url + "?file=" + silk_path
-                    # TODO: 计算silk文件语音时长，暂时都设置为5s
-                    self.client.post_voice(self.app_id, receiver, silk_url, 5000)
-                    logger.info("[gewechat] Do send voice to {}: {}".format(receiver, silk_url))
+                    self.client.post_voice(self.app_id, receiver, silk_url, duration)
+                    logger.info(f"[gewechat] Do send voice to {receiver}: {silk_url}, duration: {duration/1000.0} seconds")
                     return
                 else:
                     logger.error(f"[gewechat] voice file is not mp3, path: {content}, only support mp3")

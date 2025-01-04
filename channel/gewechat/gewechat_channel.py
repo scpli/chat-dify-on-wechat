@@ -176,25 +176,25 @@ class Query:
         data = json.loads(web.data())
         logger.debug("[gewechat] receive data: {}".format(data))
         
-        # 
+        # gewechat服务发送的回调测试消息
         if isinstance(data, dict) and 'testMsg' in data and 'token' in data:
-            logger.info(f"[gewechat] 收到gewechat服务发送的回调测试消息")
+            logger.debug(f"[gewechat] 收到gewechat服务发送的回调测试消息")
             return "success"
 
         gewechat_msg = GeWeChatMessage(data, channel.client)
         
         # 微信客户端的状态同步消息
         if gewechat_msg.ctype == ContextType.STATUS_SYNC:
-            logger.info(f"[gewechat] ignore status sync message: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] ignore status sync message: {gewechat_msg.content}")
             return "success"
 
         # 忽略非用户消息（如公众号、系统通知等）
         if gewechat_msg.ctype == ContextType.NON_USER_MSG:
-            logger.info(f"[gewechat] ignore non-user message from {gewechat_msg.from_user_id}: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] ignore non-user message from {gewechat_msg.from_user_id}: {gewechat_msg.content}")
             return "success"
 
         if gewechat_msg.my_msg:
-            logger.info(f"[gewechat] ignore message from myself: {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
+            logger.debug(f"[gewechat] ignore message from myself: {gewechat_msg.actual_user_id}: {gewechat_msg.content}")
             return "success"
         
         context = channel._compose_context(

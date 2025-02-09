@@ -21,6 +21,9 @@ MAX_UTF8_LEN = 2048
 @singleton
 class GeWeChatChannel(ChatChannel):
     NOT_SUPPORT_REPLYTYPE = []
+    TEXT_SEPERATORS = ['。', '？', '！', '?', '!', '\n']  # 文本分隔符
+    TYPING_SPEED = 3  # 每秒输入字数
+    MIN_DELAY = 0.5   # 最小延迟时间(秒)
 
     def __init__(self):
         super().__init__()
@@ -109,11 +112,26 @@ class GeWeChatChannel(ChatChannel):
         gewechat_message = context.get("msg")
         if reply.type in [ReplyType.TEXT, ReplyType.ERROR, ReplyType.INFO]:
             reply_text = reply.content
-            ats = ""
-            if gewechat_message and gewechat_message.is_group:
-                ats = gewechat_message.actual_user_id
-            self.client.post_text(self.app_id, receiver, reply_text, ats)
-            logger.info("[gewechat] Do send text to {}: {}".format(receiver, reply_text))
+            # 按标点符号分割文本
+            replaced_text = reply_text
+            for sep in self.TEXT_SEPERATORS:
+                replaced_text = replaced_text.replace(sep, '\n')
+            
+            # 处理分割后的文本，去除空白内容
+            split_texts = [text.strip() for text in replaced_text.split('\n') if text.strip()]
+            
+            if not split_texts:
+                return
+                
+            # 逐条发送消息
+            for pure_text in split_texts:
+                # 计算延迟时间，并确保不小于最小延迟
+                delay = max(len(pure_text) / self.TYPING_SPEED, self.MIN_DELAY)
+                time.sleep(delay)
+                
+                ats = ""
+                self.client.post_text(self.app_id, receiver, pure_text, ats)
+                logger.info("[gewechat] Do send text to {}: {}".format(receiver, pure_text))
         elif reply.type == ReplyType.VOICE:
             try:
                 content = reply.content

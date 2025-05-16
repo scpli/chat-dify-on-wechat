@@ -31,7 +31,7 @@ from .xunfei_tts import xunfei_tts
 from voice.audio_convert import any_to_mp3
 import shutil
 from pydub import AudioSegment
-
+from voice.audio_convert import get_pcm_from_wav
 
 class XunfeiVoice(Voice):
     def __init__(self):
@@ -54,7 +54,13 @@ class XunfeiVoice(Voice):
     def voiceToText(self, voice_file):
         # 识别本地文件
         try:
-            logger.debug("[Xunfei] voice file name={}".format(voice_file))
+            #mp3_file = os.path.splitext(voice_file)[0] + ".mp3"
+            #any_to_mp3(voice_file, mp3_file)
+            pcm_data = get_pcm_from_wav(voice_file)
+            pcm_path = os.path.splitext(voice_file)[0] + ".pcm"
+            with open(pcm_path, "wb") as f:
+                f.write(pcm_data)
+            logger.info("[Xunfei] voice file name={}".format(voice_file))
             #print("voice_file===========",voice_file)
             #print("voice_file_type===========",type(voice_file))
             #mp3_name, file_extension = os.path.splitext(voice_file)
@@ -65,7 +71,7 @@ class XunfeiVoice(Voice):
             #shutil.copy2(voice_file, 'tmp/test1.wav')
             #shutil.copy2(mp3_file, 'tmp/test1.mp3')
             #print("voice and mp3 file",voice_file,mp3_file)
-            text = xunfei_asr(self.APPID,self.APISecret,self.APIKey,self.BusinessArgsASR,voice_file)
+            text = xunfei_asr(self.APPID,self.APISecret,self.APIKey,self.BusinessArgsASR,pcm_path)
             logger.info("讯飞语音识别到了: {}".format(text))
             reply = Reply(ReplyType.TEXT, text)
         except Exception as e:

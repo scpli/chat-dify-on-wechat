@@ -1,0 +1,7 @@
+{
+  "APPID":"b55ad238",
+  "APIKey":"cddae3e7bdc06a411937b5bff730b0bd",
+  "APISecret":"ZTE1ZGE0MThhNGQzYzRjZTEyY2UzMGFh",
+  "BusinessArgsTTS":{"aue": "lame", "sfl": 1, "auf": "audio/L16;rate=16000", "vcn": "xiaoyan", "tte": "utf8"},
+  "BusinessArgsASR":{"domain": "iat", "language": "zh_cn", "accent": "mandarin", "vad_eos":1000, "dwa": "wpgs"}
+}

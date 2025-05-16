@@ -212,6 +212,7 @@ available_setting = {
     "Minimax_group_id": "",
     "Minimax_base_url": "",
     "web_port": 9899,
+    "rasa_ai_api_base": "http://localhost:5005"
 }
 
 

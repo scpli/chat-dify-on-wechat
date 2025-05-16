@@ -17,8 +17,8 @@ GEMINI = "gemini"  # gemini-1.0-pro
 MOONSHOT = "moonshot"
 MiniMax = "minimax"
 DEEPSEEK = "deepseek"  # Deepseek模型
-
 MODELSCOPE = "modelscope"
+RASA = "rasa"  # Rasa模型
 
 # model
 CLAUDE3 = "claude-3-opus-20240229"
@@ -87,13 +87,15 @@ CLAUDE_3_HAIKU = "claude-3-haiku-20240307"
 DEEPSEEK_CHAT = "deepseek-chat"  # DeepSeek-V3对话模型
 DEEPSEEK_REASONER = "deepseek-reasoner"  # DeepSeek-R1模型
 
-GITEE_AI_MODEL_LIST = ["Yi-34B-Chat", "InternVL2-8B", "deepseek-coder-33B-instruct", "InternVL2.5-26B", "Qwen2-VL-72B", "Qwen2.5-32B-Instruct", "glm-4-9b-chat", "codegeex4-all-9b", "Qwen2.5-Coder-32B-Instruct", "Qwen2.5-72B-Instruct", "Qwen2.5-7B-Instruct", "Qwen2-72B-Instruct", "Qwen2-7B-Instruct", "code-raccoon-v1", "Qwen2.5-14B-Instruct"]
+RASA_CHAT = "rasa-chat"  # rasa对话模型
+
+GITEE_AI_MODEL_LIST = ["Yi-34B-Chat", "InternVL2-8B", "deepseek-coder-33B-instruct", "InternVL2.5-26B", "Qwen2-VL-72B", "Qwen2.5-32B-Instruct", "glm-4-9b-chat", "codegeex4-all-9b", "Qwen2.5-Coder-32B-Instruct", "Qwen2.5-72B-Instruct", "Qwen2.5-7B-Instruct", "Qwen2-72B-Instruct", "Qwen2-7B-Instruct", "code-raccoon-v1", "Qwen2.5-14B-Instruct", "Rasa-chat"]
 
 MODELSCOPE_MODEL_LIST = ["LLM-Research/c4ai-command-r-plus-08-2024","mistralai/Mistral-Small-Instruct-2409","mistralai/Ministral-8B-Instruct-2410","mistralai/Mistral-Large-Instruct-2407",
                           "Qwen/Qwen2.5-Coder-32B-Instruct","Qwen/Qwen2.5-Coder-14B-Instruct","Qwen/Qwen2.5-Coder-7B-Instruct","Qwen/Qwen2.5-72B-Instruct","Qwen/Qwen2.5-32B-Instruct","Qwen/Qwen2.5-14B-Instruct","Qwen/Qwen2.5-7B-Instruct","Qwen/QwQ-32B-Preview",
                           "LLM-Research/Llama-3.3-70B-Instruct","opencompass/CompassJudger-1-32B-Instruct","Qwen/QVQ-72B-Preview","LLM-Research/Meta-Llama-3.1-405B-Instruct","LLM-Research/Meta-Llama-3.1-8B-Instruct","Qwen/Qwen2-VL-7B-Instruct","LLM-Research/Meta-Llama-3.1-70B-Instruct",
                           "Qwen/Qwen2.5-14B-Instruct-1M","Qwen/Qwen2.5-7B-Instruct-1M","Qwen/Qwen2.5-VL-3B-Instruct","Qwen/Qwen2.5-VL-7B-Instruct","Qwen/Qwen2.5-VL-72B-Instruct","deepseek-ai/DeepSeek-R1-Distill-Llama-70B","deepseek-ai/DeepSeek-R1-Distill-Llama-8B","deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
-                          "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B","deepseek-ai/DeepSeek-R1-Distill-Qwen-7B","deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B","deepseek-ai/DeepSeek-R1","deepseek-ai/DeepSeek-V3","Qwen/QwQ-32B"]
+                          "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B","deepseek-ai/DeepSeek-R1-Distill-Qwen-7B","deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B","deepseek-ai/DeepSeek-R1","deepseek-ai/DeepSeek-V3","Qwen/QwQ-32B","Rasa-chat"]
 
 MODEL_LIST = [
               GPT35, GPT35_0125, GPT35_1106, "gpt-3.5-turbo-16k",
@@ -109,7 +111,8 @@ MODEL_LIST = [
               LINKAI_35, LINKAI_4_TURBO, LINKAI_4o,
               DIFY, COZE,
               DEEPSEEK_CHAT, DEEPSEEK_REASONER,
-              MODELSCOPE
+              MODELSCOPE,
+              RASA_CHAT
             ]
 
 MODEL_LIST = MODEL_LIST + GITEE_AI_MODEL_LIST + MODELSCOPE_MODEL_LIST

@@ -366,7 +366,7 @@ class ChatChannel(Channel):
                 if semaphore.acquire(blocking=False):  # 等线程处理完毕才能删除
                     if not context_queue.empty():
                         context = context_queue.get()
-                        logger.debug("[chat_channel] consume context: {}".format(context))
+                        logger.info("[chat_channel] consume context: {}".format(context))
                         future: Future = handler_pool.submit(self._handle, context)
                         future.add_done_callback(self._thread_pool_callback(session_id, context=context))
                         with self.lock:

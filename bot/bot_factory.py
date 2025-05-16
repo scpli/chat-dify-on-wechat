@@ -84,5 +84,8 @@ def create_bot(bot_type):
         from bot.modelscope.modelscope_bot import ModelScopeBot
         return ModelScopeBot()
 
+    elif bot_type == const.RASA:
+        from bot.rasa.rasa_bot import RasaBot
+        return RasaBot()
 
     raise RuntimeError

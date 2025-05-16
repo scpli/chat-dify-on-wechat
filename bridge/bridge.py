@@ -49,6 +49,8 @@ class Bridge(object):
                 self.btype["chat"] = const.CLAUDEAPI
             if model_type and model_type.startswith("deepseek-"):
                 self.btype["chat"] = const.DEEPSEEK
+            if model_type and model_type.startswith("rasa-"):
+                self.btype["chat"] = const.RASA
 
             if model_type in ["claude"]:
                 self.btype["chat"] = const.CLAUDEAI
